@@ -99,7 +99,7 @@ horizontal_split=1
 vertical_equal=1
 left_panel_size=44
 horizontal_equal=1
-top_panel_size=20
+top_panel_size=21
 
 [Misc]
 timeformat_recent=%b %e %H:%M
@@ -114,11 +114,12 @@ clipboard_store=
 clipboard_paste=
 
 [Colors]
-base_color=
+base_color=normal=white,default:marked=magenta,default
 xterm=
 color_terminals=
-
 screen=
+xterm-256color=
+rxvt-unicode=
 
 [HotlistConfig]
 expanded_view_of_groups=0
