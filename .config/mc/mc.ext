@@ -407,7 +407,7 @@ shell/.ico
 	Include=image
 
 include/image
-	Open=(eom %f &)
+	Open=(gpicview %f &)
 	View=%view{ascii} identify %f
 	#View=%view{ascii} asciiview %f
 
