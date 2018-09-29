@@ -1,109 +1,3 @@
-# Midnight Commander 3.0 extension file
-# Warning: Structure of this file has changed completely with version 3.0
-#
-# All lines starting with # or empty lines are thrown away.
-# Lines starting in the first column should have following format:
-#
-# keyword/descNL, i.e. everything after keyword/ until new line is desc
-#
-# keyword can be:
-#
-#    shell (desc is, when starting with a dot, any extension (no wildcars),
-#          i.e. matches all the files *desc . Example: .tar matches *.tar;
-#          if it doesn't start with a dot, it matches only a file of that name)
-#
-#    regex (desc is an extended regular expression)
-#          Please note that we are using the GNU regex library and thus
-#          \| matches the literal | and | has special meaning (or) and
-#          () have special meaning and \( \) stand for literal ( ).
-#
-#    type  (file matches this if `file %f` matches regular expression desc
-#          (the filename: part from `file %f` is removed))
-#
-#    directory (matches any directory matching regular expression desc)
-#
-#    include (matches an include directive)
-#
-#    default (matches any file no matter what desc is)
-#
-# Other lines should start with a space or tab and should be in the format:
-#
-# keyword=commandNL (with no spaces around =), where keyword should be:
-#
-#    Open (if the user presses Enter or doubleclicks it),
-#
-#    View (F3), Edit (F4)
-#
-#    Include is the keyword used to add any further entries from an include/
-#    section
-#
-# command is any one-line shell command, with the following substitutions:
-#
-# %% -> % character
-# %p -> name of the current file (without path, but pwd is its path)
-# %f -> name of the current file. Unlike %p, if file is located on a
-#	non-local virtual filesystem, i.e. either tarfs or ftpfs,
-#	then the file will be temporarily copied into a local directory
-#	and %f will be the full path to this local temporal file.
-#	If you don't want to get a local copy and want to get the
-#	virtual fs path (like /#ftp:ftp.cvut.cz/pub/hungry/xword), then
-#	use %d/%p instead of %f.
-# %d -> name of the current directory (pwd, without trailing slash)
-# %s -> "selected files", i.e. space separated list of tagged files if any
-#       or name of the current file
-# %t -> list of tagged files
-# %u -> list of tagged files (they'll be untaged after the command)
-#
-# (If these 6 letters are in uppercase, they refer to the other panel.
-# But you shouldn't have to use it in this file.)
-#
-#
-# %cd -> the rest is a path mc should change into (cd won't work, since it's
-#	a child process).  %cd handles even vfs names.
-#
-# %view -> the command you type will be piped into mc's internal file viewer
-#	if you type only the %view and no command, viewer will load %f file
-#	instead (i.e. no piping, so it is different to %view cat %f)
-#	%view may be directly followed by {} with a list of any of
-#	ascii (Ascii mode), hex (Hex mode), nroff (color highlighting for
-#	text using backspace for bold and underscore) and unform
-#	(no highlighting for nroff sequences) separated by commas.
-#
-# %var -> You use it like this: %var{VAR:default}.  This macro will expand
-#       to the value of the VAR variable in the environment if it's set
-#       otherwise the value in default will be used.  This is similar to
-#       the Bourne shell ${VAR-default} construct.
-#
-# Rules are applied from top to bottom, thus the order is important.
-# If some actions are missing, search continues as if this target didn't
-# match (i.e. if a file matches the first and second entry and View action
-# is missing in the first one, then on pressing F3 the View action from
-# the second entry will be used. default should catch all the actions.
-#
-# Any new entries you develop for you are always welcome if they are
-# useful on more than one system.  You can post your modifications
-# as tickets at www.midnight-commander.org
-
-
-### Changes ###
-#
-# Reorganization: 2000-05-01 Michal Svec <rebel@penguin.cz>
-
-
-### TODO ###
-#
-# Postscript	Open: ps2svga [gs -DEVICE=jpeg|zgv or something]
-# Images		asciiview
-#
-# All X Apps	[Nothing/Warning] if no DISPLAY
-# Not found	[Default/Warning]
-# Empty Output	[Default/Warning]
-# Edit:		CopyOut+EDIT+CopyIn
-# Security	Check gzip/bzip EDIT (mktemp)
-#
-# Maybe:	Open/XOpen/GOpen/KOpen/... for Console/X/GNOME/KDE/etc.
-
-
 ### GIT Repo ###
 # gitfs changeset
 regex/^\[git\]
@@ -111,7 +5,6 @@ regex/^\[git\]
 	View=%cd %p/patchsetfs://
 
 ### Archives ###
-
 # .tgz, .tpz, .tar.gz, .tar.z, .tar.Z, .ipk
 regex/\.t([gp]?z|ar\.g?[zZ])$|\.ipk|\.gem$
 	Open=%cd %p/utar://
@@ -258,47 +151,8 @@ regex/\.(7z|7Z)$
 	Open=%cd %p/u7z://
 	View=%view{ascii} 7za l %f 2>/dev/null
 
-# Mailboxes
-type/^ASCII\ mail\ text
-	Open=%cd %p/mailfs://
-
-
-### Sources ###
-
-# C
-shell/.c
-	Include=editor
-
-# Fortran
-shell/.f
-	Include=editor
-
-# Header
-regex/\.(h|hpp)$
-	Include=editor
-
-# Asm
-shell/.s
-	Include=editor
-
-# C++
-regex/\.(C|cc|cpp)$
-	Include=editor
-
-include/editor
-	Open=%var{EDITOR:vi} %f
-
-# .so libraries
-regex/\.(so|so\.[0-9\.]*)$
-	View=%view{ascii} file %f && nm -C -D %f
-
-# Object
-type/^ELF
-	#Open=%var{PAGER:more} %f
-	View=%view{ascii} file %f && nm -C %f
 
 ### Documentation ###
-
 # Texinfo
 #regex/\.(te?xi|texinfo)$
 
@@ -359,12 +213,7 @@ regex/([^0-9]|^[^\.]*)\.([1-9][A-Za-z]*|[ln])\.xz$
 	Open=case %d/%f in */log/*|*/logs/*) xz -dc %f ;; *) xz -dc %f | nroff -c -Tlatin1 -mandoc ;; esac | %var{PAGER:more}
 	View=%view{ascii,nroff} case %d/%f in */log/*|*/logs/*) xz -dc %f ;; *) xz -dc %f | nroff -c -Tlatin1 -mandoc ;; esac
 
-# CHM
-regex/\.(chm|CHM)$
-	Open=which kchmviewer > /dev/null 2>&1 && (kchmviewer %f &) || (xchm %f &)
-
 ### Images ###
-
 type/^GIF
 	Include=image
 
@@ -409,92 +258,77 @@ shell/.ico
 include/image
 	Open=(gpicview %f &)
 	View=%view{ascii} identify %f
-	#View=%view{ascii} asciiview %f
 
 
-### Sound files ###
-
+### Media files ###
+# audio
 regex/\.([wW][aA][vV]|[sS][nN][dD]|[vV][oO][cC]|[aA][uU]|[sS][mM][pP]|[aA][iI][fF][fF]|[sS][nN][dD])$
-       Open=if [ "$DISPLAY" = "" ]; then play %f; else (xmms %f >/dev/null 2>&1 &); fi
+  Include=media
 
 regex/\.([mM][oO][dD]|[sS]3[mM]|[xX][mM]|[iI][tT]|[mM][tT][mM]|669|[sS][tT][mM]|[uU][lL][tT]|[fF][aA][rR])$
-       Open=mikmod %f
-       #Open=tracker %f
+  Include=media
 
 regex/\.([wW][aA][wW]22)$
-       Open=vplay -s 22 %f
+  Include=media
 
 regex/\.([mM][pP]3)$
-	Open=if [ "$DISPLAY" = "" ]; then mpg123 %f; else (xmms %f >/dev/null 2>&1 &); fi
-	View=%view{ascii} mpg123 -vtn1 %f 2>&1 | sed -n '/^Title/,/^Comment/p;/^MPEG/,/^Audio/p'
+  Include=media
 
 regex/\.([oO][gG][gG|aA|vV|xX])$
-	Open=if [ "$DISPLAY" = "" ]; then ogg123 %f; else (xmms %f >/dev/null 2>&1 &); fi
-	View=%view{ascii} ogginfo %s
+  Include=media
 
 regex/\.([sS][pP][xX]|[fF][lL][aA][cC])$
-	Open=if [ "$DISPLAY" = "" ]; then play %f; else (xmms %f >/dev/null 2>&1 &); fi
+  Include=media
 
 regex/\.([mM][iI][dD][iI]?|[rR][mM][iI][dD]?)$
-	Open=timidity %f
+  Include=media
 
 regex/\.([wW][mM][aA])$
-	Open=mplayer -vo null %f
-	View=%view{ascii} mplayer -quiet -slave -frames 0 -vo null -ao null -identify %f 2>/dev/null | tail +13 || file %f
-
-
-### Play lists ###
+  Include=media
 
 regex/\.([mM]3[uU]|[pP][lL][sS])$
-	Open=if [ -z "$DISPLAY" ]; then mplayer -vo null -playlist %f; else (xmms -p %f >/dev/null 2>&1 &); fi
+  Include=media
 
-
-### Video ###
-
+# video
 regex/\.([aA][vV][iI])$
-	Include=video
+	Include=media
 
 regex/\.([aA][sS][fFxX])$
-	Include=video
+	Include=media
 
 regex/\.([dD][iI][vV][xX])$
-	Include=video
+	Include=media
 
 regex/\.([mM][kK][vV])$
-	Include=video
+	Include=media
 
 regex/\.([mM][oO][vV]|[qQ][tT])$
-	Include=video
+	Include=media
 
 regex/\.([mM][pP]4|[mM]4[vV]|[mM][pP][eE]?[gG])$
-	Include=video
+	Include=media
 
 # MPEG-2 TS container + H.264 codec
 regex/\.([mM][tT][sS])$
-	Include=video
+	Include=media
 
 regex/\.([tT][sS])$
-	Include=video
+	Include=media
 
 regex/\.([vV][oO][bB])$
-	Include=video
+	Include=media
 
 regex/\.([wW][mM][vV])$
-	Include=video
+	Include=media
 
 regex/\.([fF][lL][iIcCvV])$
-	Include=video
+	Include=media
 
 regex/\.([oO][gG][mM])$
-	Include=video
+	Include=media
 
-regex/\.([rR][aA]?[mM])$
-	Open=(realplay %f >/dev/null 2>&1 &)
-
-include/video
-	Open=(mplayer %f >/dev/null 2>&1 &)
-	#Open=(gtv %f >/dev/null 2>&1 &)
-	#Open=(xanim %f >/dev/null 2>&1 &)
+include/media
+	Open=(mpv %f)
 
 
 ### Documents ###
